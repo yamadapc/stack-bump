@@ -1,0 +1,38 @@
+name: stack-bump
+version: '0.1.0.0'
+
+
+category: Development
+author: Pedro Tacla Yamada
+maintainer: tacla.yamada@gmail.com
+license: MIT
+homepage: https://github.com/yamadapc/stack-bump
+
+extra-source-files:
+- ChangeLog.md
+
+dependencies:
+- base >=4.8 && <4.9
+- optparse-applicative
+- yaml
+- lens
+- lens-aeson
+- text
+- bytestring
+- process
+- strict
+
+executables:
+  stack-bump:
+    main: Main.hs
+    source-dirs: src
+
+tests:
+  hspec:
+    main: Spec.hs
+    source-dirs:
+    - src
+    - test
+    dependencies:
+    - hspec
+    - QuickCheck
