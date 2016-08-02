@@ -5,9 +5,11 @@ module StackBump.Main where
 import           Prelude               hiding (readFile)
 
 import           Control.Lens          hiding ((.=))
+import           Control.Monad
 import           Data.Aeson.Lens
 import qualified Data.ByteString.Char8 as ByteString (pack, unpack)
 import           Data.List
+import           Data.Maybe
 import           Data.Text             (Text)
 import qualified Data.Text             as Text
 import           Data.Yaml
@@ -82,7 +84,7 @@ main :: IO ()
 main = do
     as <- getArgs
 
-    when (listToMaybe as == Just "help") do
+    when (listToMaybe as == Just "help") $ do
         putStrLn (unlines [ "Usage: stack-bump <patch|minor|major|other <n>>"
                           ])
         exitSuccess
