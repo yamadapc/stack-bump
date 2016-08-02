@@ -1,21 +1,21 @@
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BangPatterns      #-}
 {-# LANGUAGE OverloadedStrings #-}
 module StackBump.Main where
 
-import Prelude hiding (readFile)
+import           Prelude               hiding (readFile)
 
-import Control.Lens hiding ((.=))
-import Data.Aeson.Lens
-import qualified Data.ByteString.Char8 as ByteString (unpack, pack)
-import Data.List
-import Data.Text (Text)
-import qualified Data.Text as Text
-import Data.Yaml
-import Options.Applicative
-import System.Environment
-import Text.Read
-import System.Process
-import System.IO.Strict
+import           Control.Lens          hiding ((.=))
+import           Data.Aeson.Lens
+import qualified Data.ByteString.Char8 as ByteString (pack, unpack)
+import           Data.List
+import           Data.Text             (Text)
+import qualified Data.Text             as Text
+import           Data.Yaml
+import           Options.Applicative
+import           System.Environment
+import           System.IO.Strict
+import           System.Process
+import           Text.Read
 
 data BumpType = BumpTypeOther Int
               | BumpTypePatch

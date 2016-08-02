@@ -4,11 +4,11 @@ module MainSpec
     )
   where
 
-import Data.Either
-import Test.Hspec
-import Test.QuickCheck
+import           Data.Either
+import           Test.Hspec
+import           Test.QuickCheck
 
-import StackBump.Main
+import           StackBump.Main
 
 spec :: Spec
 spec =
