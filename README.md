@@ -6,3 +6,6 @@ Should behave in the same way as `npm version ...`.
 ```
 $ stack bump minor
 ```
+
+## License
+MIT
