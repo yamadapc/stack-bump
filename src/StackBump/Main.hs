@@ -75,6 +75,8 @@ run bt = do
         Left e -> error e
         Right v -> do
             callCommand ("git add package.yaml")
+            callCommand ("hpack")
+            callCommand ("git add *.cabal")
             callCommand ("git commit -m \"v" <> v <> "\"")
             callCommand ("git tag v" <> v)
 
