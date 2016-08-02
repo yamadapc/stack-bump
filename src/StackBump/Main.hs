@@ -87,8 +87,7 @@ main = do
     as <- getArgs
 
     when (listToMaybe as == Just "help") $ do
-        putStrLn (unlines [ "Usage: stack-bump <patch|minor|major|other <n>>"
-                          ])
+        putStrLn "Usage: stack-bump <patch|minor|major|other <n>>"
         exitSuccess
 
     case readBumpType as of
