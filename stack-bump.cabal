@@ -3,7 +3,7 @@
 -- see: https://github.com/sol/hpack
 
 name:           stack-bump
-version:        0.1.1.0
+version:        0.1.2.0
 category:       Development
 homepage:       https://github.com/yamadapc/stack-bump
 author:         Pedro Tacla Yamada

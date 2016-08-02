@@ -13,6 +13,7 @@ import qualified Data.Text             as Text
 import           Data.Yaml
 import           Options.Applicative
 import           System.Environment
+import           System.Exit
 import           System.IO.Strict
 import           System.Process
 import           Text.Read
@@ -63,7 +64,7 @@ readBumpType as = case as of
     ("patch":_) -> Right BumpTypePatch
     ("minor":_) -> Right BumpTypeMinor
     ("major":_) -> Right BumpTypeMajor
-    _ -> Left "Usage: stack-bump patch|minor|major"
+    _ -> Left "Usage: stack-bump <patch|minor|major|other <n>>"
 
 run :: BumpType -> IO ()
 run bt = do
@@ -80,6 +81,12 @@ run bt = do
 main :: IO ()
 main = do
     as <- getArgs
+
+    when (listToMaybe as == Just "help") do
+        putStrLn (unlines [ "Usage: stack-bump <patch|minor|major|other <n>>"
+                          ])
+        exitSuccess
+
     case readBumpType as of
         Left err -> error err
         Right bumpType -> run bumpType
