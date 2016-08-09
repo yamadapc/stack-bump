@@ -74,6 +74,10 @@ run bt = do
     case ev of
         Left e -> error e
         Right v -> do
+            callCommand ("stack build")
+            callCommand ("stack test")
+            callCommand ("stack sdist")
+
             callCommand ("git add package.yaml")
             callCommand ("hpack")
             callCommand ("git add *.cabal")
