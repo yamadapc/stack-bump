@@ -84,8 +84,10 @@ run bt = do
     case ev of
         Left e -> error e
         Right (packageYaml', v) -> do
+            setSGR [SetColor Foreground Vivid Yellow]
+            putChar '•'
             setSGR [SetColor Foreground Vivid Black]
-            putStrLn "o Checking if package is good for publishing"
+            putStrLn " Checking if package is good for publishing"
             runProcessWithSpinner "stack build"
             runProcessWithSpinner "stack test"
             runProcessWithSpinner "stack sdist"
@@ -95,8 +97,10 @@ run bt = do
             setSGR [SetColor Foreground Vivid Green]
             putStrLn "✓ Checking if package is good for publishing"
 
+            setSGR [SetColor Foreground Vivid Yellow]
+            putChar '•'
             setSGR [SetColor Foreground Vivid Black]
-            putStrLn $ "o Writting new version (v" <> v <> ")"
+            putStrLn $ " Writting new version (v" <> v <> ")"
             writeFile "package.yaml" packageYaml'
             cursorUp 1
             clearLine
@@ -104,8 +108,10 @@ run bt = do
             setSGR [SetColor Foreground Vivid Green]
             putStrLn $ "✓ Writting new version (v" <> v <> ")"
 
+            setSGR [SetColor Foreground Vivid Yellow]
+            putChar '•'
             setSGR [SetColor Foreground Vivid Black]
-            putStrLn $ "o Commiting (v" <> v <> ")"
+            putStrLn $ " Commiting (v" <> v <> ")"
             runProcessWithSpinner "git add package.yaml"
             runProcessWithSpinner ("stack build")
             runProcessWithSpinner ("git commit -m \"v" <> v <> "\"")
