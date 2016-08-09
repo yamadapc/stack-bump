@@ -28,7 +28,7 @@ data BumpType = BumpTypeOther Int
 
 data Package = Package String
 
-bumpPackage :: BumpType -> IO (Either String String)
+bumpPackage :: BumpType -> IO (Either String (String, String))
 bumpPackage bt = do
     !pkg <- lines <$> readFile "package.yaml"
     let i = findIndex ("version" `isPrefixOf`) pkg
@@ -43,9 +43,7 @@ bumpPackage bt = do
             case ebv of
                 Left e -> return (Left e)
                 Right bv -> do
-                    writeFile "package.yaml"
-                        (unlines (p <> [init (ByteString.unpack (encode (object ["version" .= bv])))] <> ps))
-                    return (Right bv)
+                    return (Right (packageYaml', bv))
 
 bump :: BumpType -> [String] -> Either String [String]
 bump BumpTypeMajor (n:ns) = (:(map (const "0") ns)) . show . (+1) <$> readEither n
@@ -73,10 +71,12 @@ run bt = do
     ev <- bumpPackage bt
     case ev of
         Left e -> error e
-        Right v -> do
+        Right (packageYaml', v) -> do
             callCommand ("stack build")
             callCommand ("stack test")
             callCommand ("stack sdist")
+
+            writeFile "package.yaml" packageYaml'
 
             callCommand ("git add package.yaml")
             callCommand ("hpack")
