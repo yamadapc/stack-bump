@@ -1,5 +1,5 @@
 name: stack-bump
-version: '0.3.6.0'
+version: '0.3.7.0'
 category: Development
 author: Pedro Tacla Yamada
 synopsis: 'Dead simple version bumping for hpack packages'
@@ -23,6 +23,8 @@ dependencies:
 - bytestring
 - process
 - strict
+- async
+- ansi-terminal
 
 executables:
   stack-bump:
