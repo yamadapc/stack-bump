@@ -98,6 +98,7 @@ run bt = do
             setSGR [SetColor Foreground Vivid Black]
             putStrLn $ "o Writting new version (" <> v <> ")"
             writeFile "package.yaml" packageYaml'
+            cursorUp 1
             clearLine
             setCursorColumn 0
             setSGR [SetColor Foreground Vivid Green]
@@ -109,6 +110,7 @@ run bt = do
             runProcessWithSpinner ("stack build")
             runProcessWithSpinner ("git commit -m \"v" <> v <> "\"")
             runProcessWithSpinner ("git tag v" <> v)
+            cursorUp 1
             clearLine
             setCursorColumn 0
             setSGR [SetColor Foreground Vivid Green]
