@@ -77,12 +77,15 @@ run bt = do
     case ev of
         Left e -> error e
         Right (packageYaml', v) -> do
+            putStrLn ">>> Checking if the package is good for publishing..."
             callCommand ("stack build")
             callCommand ("stack test")
             callCommand ("stack sdist")
 
+            putStrLn $ ">>> Writting new version (" <> v <> ")"
             writeFile "package.yaml" packageYaml'
 
+            putStrLn $ ">>> Commiting (" <> v <> ")"
             callCommand ("git add package.yaml")
             callCommand ("hpack")
             callCommand ("git add *.cabal")

@@ -2,6 +2,10 @@ name: stack-bump
 version: '0.3.4.0'
 category: Development
 author: Pedro Tacla Yamada
+synopsis: 'Dead simple version bumping for hpack packages'
+description: '
+Runs tests and build with stack, then bumps the package with a tagged commit.
+'
 maintainer: tacla.yamada@gmail.com
 license: MIT
 homepage: https://github.com/yamadapc/stack-bump
