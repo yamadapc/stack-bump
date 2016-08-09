@@ -1,5 +1,5 @@
 name: stack-bump
-version: '0.4.3.0'
+version: '0.5.0.0'
 category: Development
 author: Pedro Tacla Yamada
 synopsis: 'Dead simple version bumping for hpack packages'
