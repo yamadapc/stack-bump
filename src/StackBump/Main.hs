@@ -48,16 +48,16 @@ bumpPackage bt = do
                     return (Right bv)
 
 bump :: BumpType -> [String] -> Either String [String]
-bump BumpTypeMajor (n:ns) = (:ns) . show . (+1) <$> readEither n
+bump BumpTypeMajor (n:ns) = (:(map (const "0") ns)) . show . (+1) <$> readEither n
 bump BumpTypeMajor _ = Left "Can't major bump"
-bump BumpTypeMinor (n1:n:ns) = (\x -> n1:x:ns) . show . (+1) <$> readEither n
+bump BumpTypeMinor (n1:n:ns) = (\x -> n1:x:(map (const "0") ns)) . show . (+1) <$> readEither n
 bump BumpTypeMinor _ = Left "Can't minor bump"
-bump BumpTypePatch (n1:n2:n:ns) = (\x -> n1:n2:x:ns) . show . (+1) <$> readEither n
+bump BumpTypePatch (n1:n2:n:ns) = (\x -> n1:n2:x:(map (const "0") ns)) . show . (+1) <$> readEither n
 bump BumpTypePatch _ = Left "Can't patch bump"
 bump (BumpTypeOther c) ns = if c >= length ns
     then Left ("Can't bump " <> show c <> " component")
     else let (n1, (n:n2)) = splitAt c ns
-         in (\x -> n1 <> (x:n2)) . show . (+1) <$> readEither n
+         in (\x -> n1 <> (x:map (const "0") n2)) . show . (+1) <$> readEither n
 
 readBumpType :: [String] -> Either String BumpType
 readBumpType as = case as of
