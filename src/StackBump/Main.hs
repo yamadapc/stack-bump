@@ -4,6 +4,9 @@ module StackBump.Main where
 
 import           Prelude               hiding (readFile)
 
+import           Control.Concurrent
+import           Control.Concurrent.Async
+import           Control.Exception
 import           Control.Lens          hiding ((.=))
 import           Control.Monad
 import           Data.Aeson.Lens
@@ -14,11 +17,15 @@ import           Data.Text             (Text)
 import qualified Data.Text             as Text
 import           Data.Yaml
 import           Options.Applicative
+import           System.Console.ANSI
 import           System.Environment
 import           System.Exit
+import           System.IO (hPutStrLn, stderr)
 import           System.IO.Strict
 import           System.Process
 import           Text.Read
+
+import           StackBump.Spinner
 
 data BumpType = BumpTypeOther Int
               | BumpTypePatch
@@ -77,20 +84,39 @@ run bt = do
     case ev of
         Left e -> error e
         Right (packageYaml', v) -> do
-            putStrLn ">>> Checking if the package is good for publishing..."
-            callCommand ("stack build")
-            callCommand ("stack test")
-            callCommand ("stack sdist")
+            setSGR [SetColor Foreground Vivid Black]
+            putStrLn "o Checking if package is good for publishing"
+            runProcessWithSpinner "stack build"
+            runProcessWithSpinner "stack test"
+            runProcessWithSpinner "stack sdist"
+            cursorUp 1
+            clearLine
+            setCursorColumn 0
+            setSGR [SetColor Foreground Vivid Green]
+            putStrLn "✓ Checking if package is good for publishing"
 
-            putStrLn $ ">>> Writting new version (" <> v <> ")"
+            setSGR [SetColor Foreground Vivid Black]
+            putStrLn $ "o Writting new version (" <> v <> ")"
             writeFile "package.yaml" packageYaml'
+            clearLine
+            setCursorColumn 0
+            setSGR [SetColor Foreground Vivid Green]
+            putStrLn $ "✓ Writting new version (" <> v <> ")"
 
-            putStrLn $ ">>> Commiting (" <> v <> ")"
-            callCommand ("git add package.yaml")
-            callCommand ("stack build > /dev/null")
-            callCommand ("git commit -m \"v" <> v <> "\"")
-            callCommand ("git tag v" <> v)
+            setSGR [SetColor Foreground Vivid Black]
+            putStrLn $ "o Commiting (" <> v <> ")"
+            runProcessWithSpinner "git add package.yaml"
+            runProcessWithSpinner ("stack build")
+            runProcessWithSpinner ("git commit -m \"v" <> v <> "\"")
+            runProcessWithSpinner ("git tag v" <> v)
+            clearLine
+            setCursorColumn 0
+            setSGR [SetColor Foreground Vivid Green]
+            putStrLn $ "✓ Commiting (" <> v <> ")"
 
+            putStrLn ""
+
+            setSGR [SetColor Foreground Vivid White]
             putStrLn ("Bumped version to: " <> v)
 
 main :: IO ()
