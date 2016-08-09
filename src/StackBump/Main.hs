@@ -96,16 +96,16 @@ run bt = do
             putStrLn "✓ Checking if package is good for publishing"
 
             setSGR [SetColor Foreground Vivid Black]
-            putStrLn $ "o Writting new version (" <> v <> ")"
+            putStrLn $ "o Writting new version (v" <> v <> ")"
             writeFile "package.yaml" packageYaml'
             cursorUp 1
             clearLine
             setCursorColumn 0
             setSGR [SetColor Foreground Vivid Green]
-            putStrLn $ "✓ Writting new version (" <> v <> ")"
+            putStrLn $ "✓ Writting new version (v" <> v <> ")"
 
             setSGR [SetColor Foreground Vivid Black]
-            putStrLn $ "o Commiting (" <> v <> ")"
+            putStrLn $ "o Commiting (v" <> v <> ")"
             runProcessWithSpinner "git add package.yaml"
             runProcessWithSpinner ("stack build")
             runProcessWithSpinner ("git commit -m \"v" <> v <> "\"")
@@ -114,12 +114,12 @@ run bt = do
             clearLine
             setCursorColumn 0
             setSGR [SetColor Foreground Vivid Green]
-            putStrLn $ "✓ Commiting (" <> v <> ")"
+            putStrLn $ "✓ Commiting (v" <> v <> ")"
 
             putStrLn ""
 
             setSGR [SetColor Foreground Vivid White]
-            putStrLn ("Bumped version to: " <> v)
+            putStrLn ("Bumped version to: v" <> v)
 
 main :: IO ()
 main = do
