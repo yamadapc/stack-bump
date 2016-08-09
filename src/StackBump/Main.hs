@@ -78,49 +78,38 @@ readBumpType as = case as of
     ("major":_) -> Right BumpTypeMajor
     _ -> Left "Usage: stack-bump <patch|minor|major|other <n>>"
 
+runTasks title action = do
+    setSGR [SetColor Foreground Vivid Yellow]
+    putChar '•'
+    setSGR [SetColor Foreground Vivid Black]
+    putStrLn (" " <> title)
+    action
+    cursorUp 1
+    clearLine
+    setCursorColumn 0
+    setSGR [SetColor Foreground Vivid Green]
+    putChar '✓'
+    putStrLn (" " <> title)
+
 run :: BumpType -> IO ()
 run bt = do
     ev <- bumpPackage bt
     case ev of
         Left e -> error e
         Right (packageYaml', v) -> do
-            setSGR [SetColor Foreground Vivid Yellow]
-            putChar '•'
-            setSGR [SetColor Foreground Vivid Black]
-            putStrLn " Checking if package is good for publishing"
-            runProcessWithSpinner "stack build"
-            runProcessWithSpinner "stack test"
-            runProcessWithSpinner "stack sdist"
-            cursorUp 1
-            clearLine
-            setCursorColumn 0
-            setSGR [SetColor Foreground Vivid Green]
-            putStrLn "✓ Checking if package is good for publishing"
+            runTasks "Checking if package is good for publishing" $ do
+                runProcessWithSpinner "stack build"
+                runProcessWithSpinner "stack test"
+                runProcessWithSpinner "stack sdist"
 
-            setSGR [SetColor Foreground Vivid Yellow]
-            putChar '•'
-            setSGR [SetColor Foreground Vivid Black]
-            putStrLn $ " Writting new version (v" <> v <> ")"
-            writeFile "package.yaml" packageYaml'
-            cursorUp 1
-            clearLine
-            setCursorColumn 0
-            setSGR [SetColor Foreground Vivid Green]
-            putStrLn $ "✓ Writting new version (v" <> v <> ")"
+            runTasks ("Writting new version (v" <> v <> ")") $ do
+                writeFile "package.yaml" packageYaml'
 
-            setSGR [SetColor Foreground Vivid Yellow]
-            putChar '•'
-            setSGR [SetColor Foreground Vivid Black]
-            putStrLn $ " Commiting (v" <> v <> ")"
-            runProcessWithSpinner "git add package.yaml"
-            runProcessWithSpinner ("stack build")
-            runProcessWithSpinner ("git commit -m \"v" <> v <> "\"")
-            runProcessWithSpinner ("git tag v" <> v)
-            cursorUp 1
-            clearLine
-            setCursorColumn 0
-            setSGR [SetColor Foreground Vivid Green]
-            putStrLn $ "✓ Commiting (v" <> v <> ")"
+            runTasks (" Commiting (v" <> v <> ")") $ do
+                runProcessWithSpinner "git add package.yaml"
+                runProcessWithSpinner ("stack build")
+                runProcessWithSpinner ("git commit -m \"v" <> v <> "\"")
+                runProcessWithSpinner ("git tag v" <> v)
 
             putStrLn ""
 
