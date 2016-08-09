@@ -43,6 +43,11 @@ bumpPackage bt = do
             case ebv of
                 Left e -> return (Left e)
                 Right bv -> do
+                    let packageYaml' = unlines ( p
+                                              <> [ init (ByteString.unpack (encode (object ["version" .= bv])))
+                                                 ]
+                                              <> ps
+                                               )
                     return (Right (packageYaml', bv))
 
 bump :: BumpType -> [String] -> Either String [String]
