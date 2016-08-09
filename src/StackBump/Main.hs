@@ -87,8 +87,7 @@ run bt = do
 
             putStrLn $ ">>> Commiting (" <> v <> ")"
             callCommand ("git add package.yaml")
-            callCommand ("hpack")
-            callCommand ("git add *.cabal")
+            callCommand ("stack build > /dev/null")
             callCommand ("git commit -m \"v" <> v <> "\"")
             callCommand ("git tag v" <> v)
 
