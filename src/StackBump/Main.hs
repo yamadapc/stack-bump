@@ -89,6 +89,7 @@ runTasks title action = do
     setCursorColumn 0
     setSGR [SetColor Foreground Vivid Green]
     putChar '✓'
+    setSGR [SetColor Foreground Vivid Black]
     putStrLn (" " <> title)
 
 run :: BumpType -> IO ()
@@ -105,7 +106,7 @@ run bt = do
             runTasks ("Writting new version (v" <> v <> ")") $ do
                 writeFile "package.yaml" packageYaml'
 
-            runTasks (" Commiting (v" <> v <> ")") $ do
+            runTasks ("Commiting (v" <> v <> ")") $ do
                 runProcessWithSpinner "git add package.yaml"
                 runProcessWithSpinner ("stack build")
                 runProcessWithSpinner ("git commit -m \"v" <> v <> "\"")
