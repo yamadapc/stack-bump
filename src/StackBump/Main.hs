@@ -44,7 +44,7 @@ bumpPackage bt = do
                 Left e -> return (Left e)
                 Right bv -> do
                     writeFile "package.yaml"
-                        (unlines (p <> [ByteString.unpack (encode (object ["version" .= bv]))] <> ps))
+                        (unlines (p <> [init (ByteString.unpack (encode (object ["version" .= bv])))] <> ps))
                     return (Right bv)
 
 bump :: BumpType -> [String] -> Either String [String]
