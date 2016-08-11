@@ -46,8 +46,12 @@ displaySpinner title action = do
     setCursorColumn 0
 
 runProcessWithSpinner :: String -> IO ()
-runProcessWithSpinner title = do
+runProcessWithSpinner title =
     let (c:args) = words title
+    in runProcessWithSpinnerRaw title c args
+
+runProcessWithSpinnerRaw :: String -> String -> [String] -> IO ()
+runProcessWithSpinnerRaw title c args = do
     displaySpinner title =<< (async $ do
         (ec, out, err) <- readProcessWithExitCode c args ""
         when (ec /= ExitSuccess) $ do
