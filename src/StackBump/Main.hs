@@ -22,6 +22,7 @@ import           System.Environment
 import           System.Exit
 import           System.IO (hPutStrLn, stderr)
 import           System.IO.Strict
+import           System.FilePath
 import           System.FilePath.Glob
 import           System.Process
 import           Text.Read
@@ -110,7 +111,7 @@ run bt = do
             runTasks ("Commiting (v" <> v <> ")") $ do
                 runProcessWithSpinner ("stack build")
                 runProcessWithSpinner "git add package.yaml"
-                mcabalFile <- listToMaybe <$> glob "./*.cabal"
+                mcabalFile <- findCabalfile
                 case mcabalFile of
                     Just cabalFile -> runProcessWithSpinner ("git add " <> cabalFile)
                     Nothing -> return ()
@@ -121,6 +122,19 @@ run bt = do
 
             setSGR [SetColor Foreground Vivid White]
             putStrLn ("Bumped version to: v" <> v)
+
+findCabalfile = do
+    mgitIgnore <- listToMaybe <$> glob ".gitignore"
+    case mgitIgnore of
+        Nothing -> findCabalfile'
+        Just gitIgnore -> do
+            gitIgnoreC <- lines <$> readFile gitIgnore
+            let ignoringCabalFile = isJust $ find ((== ".cabal") . takeExtension) gitIgnoreC
+            if ignoringCabalFile
+                then return Nothing
+                else findCabalfile'
+  where
+    findCabalfile' = listToMaybe <$> glob "./*.cabal"
 
 main :: IO ()
 main = do
