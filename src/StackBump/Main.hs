@@ -22,6 +22,7 @@ import           System.Environment
 import           System.Exit
 import           System.IO (hPutStrLn, stderr)
 import           System.IO.Strict
+import           System.FilePath.Glob
 import           System.Process
 import           Text.Read
 
@@ -107,8 +108,12 @@ run bt = do
                 writeFile "package.yaml" packageYaml'
 
             runTasks ("Commiting (v" <> v <> ")") $ do
-                runProcessWithSpinner "git add package.yaml"
                 runProcessWithSpinner ("stack build")
+                runProcessWithSpinner "git add package.yaml"
+                mcabalFile <- listToMaybe <$> glob "./*.cabal"
+                case mcabalFile of
+                    Just cabalFile -> runProcessWithSpinner ("git add " <> cabalFile)
+                    Nothing -> return ()
                 runProcessWithSpinner ("git commit -m \"v" <> v <> "\"")
                 runProcessWithSpinner ("git tag v" <> v)
 

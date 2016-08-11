@@ -25,6 +25,7 @@ dependencies:
 - strict
 - async
 - ansi-terminal
+- Glob
 
 executables:
   stack-bump:
