@@ -115,7 +115,7 @@ run bt = do
                 case mcabalFile of
                     Just cabalFile -> runProcessWithSpinner ("git add " <> cabalFile)
                     Nothing -> return ()
-                runProcessWithSpinnerRaw "git commit -m ..." "git" ["commit", "-m", "Bump version to v" <> v <> "'"]
+                runProcessWithSpinnerRaw "git commit -m ..." "git" ["commit", "-m", "Bump version to v" <> v]
                 runProcessWithSpinner ("git tag v" <> v)
 
             putStrLn ""
