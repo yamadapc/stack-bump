@@ -1,7 +1,7 @@
 # stack-bump
-Just a very simple `stack bump` extension.
+Just a very simple `stack bump` extension for `hpack` projects.
 
-Should behave in the same way as `npm version ...`.
+Should behave in a similar way to `npm version ...`.
 
 ```
 $ stack bump minor
