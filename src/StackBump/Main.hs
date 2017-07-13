@@ -1,5 +1,6 @@
 {-# LANGUAGE BangPatterns      #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE RecordWildCards   #-}
 module StackBump.Main where
 
 import           Prelude               hiding (readFile)
@@ -29,6 +30,10 @@ data BumpType
   | BumpTypeMinor
   | BumpTypeMajor
   deriving (Show, Eq)
+
+data Options = Options { optsBumpType :: BumpType
+                       , optsVerify   :: Bool
+                       }
 
 data Package =
   Package String
@@ -74,15 +79,22 @@ bump (BumpTypeOther c) ns =
          in (\x -> n1 <> (x : map (const "0") n2)) . show . (+ (1 :: Int)) <$>
             readEither n
 
-readBumpType :: [String] -> Either String BumpType
-readBumpType as =
-  case as of
-    ["other"]     -> Left "Usage: stack-bump other <n>"
-    ("other":x:_) -> BumpTypeOther <$> readEither x
-    ("patch":_)   -> Right BumpTypePatch
-    ("minor":_)   -> Right BumpTypeMinor
-    ("major":_)   -> Right BumpTypeMajor
-    _             -> Left "Usage: stack-bump <patch|minor|major|other <n>>"
+readOptions :: [String] -> Either String Options
+readOptions as = do
+  bt <-
+    case as of
+      ["other"]     -> Left usage
+      ("other":x:_) -> BumpTypeOther <$> readEither x
+      ("patch":_)   -> Right BumpTypePatch
+      ("minor":_)   -> Right BumpTypeMinor
+      ("major":_)   -> Right BumpTypeMajor
+      _             -> Left usage
+  let verify =
+        case as of
+          (_:"-v":_)       -> True
+          (_:"--verify":_) -> True
+          _                -> False
+  return $ Options bt verify
 
 runTasks :: String -> IO a -> IO ()
 runTasks title action = do
@@ -99,20 +111,23 @@ runTasks title action = do
   setSGR [SetColor Foreground Vivid Black]
   putStrLn (" " <> title)
 
-run :: BumpType -> IO ()
-run bt = do
-  ev <- bumpPackage bt
+run :: Options -> IO ()
+run Options{..} = do
+  ev <- bumpPackage optsBumpType
   case ev of
     Left e -> error e
     Right (packageYaml', v) -> do
-      runTasks "Checking if package is good for publishing" $ do
+      when optsVerify $ runTasks "Checking if package is good for publishing" $ do
         runProcessWithSpinner "stack build"
         runProcessWithSpinner "stack test"
         runProcessWithSpinner "stack sdist"
+
       runTasks ("Writting new version (v" <> v <> ")") $
         writeFile "package.yaml" packageYaml'
+
       runTasks ("Commiting (v" <> v <> ")") $ do
-        runProcessWithSpinner "stack build"
+        when optsVerify $ runProcessWithSpinner "stack build"
+        unless optsVerify $ runProcessWithSpinner "hpack"
         runProcessWithSpinner "git add package.yaml"
         mcabalFile <- findCabalfile
         case mcabalFile of
@@ -142,12 +157,15 @@ findCabalfile = do
   where
     findCabalfile' = listToMaybe <$> glob "./*.cabal"
 
+usage :: String
+usage = "Usage: stack-bump <patch|minor|major|other <n>> [--verify|-v]"
+
 main :: IO ()
 main = do
   as <- getArgs
   when (listToMaybe as == Just "help") $ do
-    putStrLn "Usage: stack-bump <patch|minor|major|other <n>>"
+    putStrLn usage
     exitSuccess
-  case readBumpType as of
-    Left err       -> error err
-    Right bumpType -> run bumpType
+  case readOptions as of
+    Left err   -> error err
+    Right opts -> run opts
