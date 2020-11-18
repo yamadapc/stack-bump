@@ -46,7 +46,7 @@ bumpPackage bt = do
     Nothing -> return (Left "No `version` to bump")
     Just i -> do
       let (p, versionStr:ps) = splitAt i pkg -- Partial, but can't be
-          ev = decodeEither (ByteString.pack versionStr) :: Either String Value
+          ev = decodeEither' (ByteString.pack versionStr) :: Either ParseException Value
           vstring = ev ^. _Right . key "version" . _String
           vstringS = map Text.unpack (Text.split (== '.') vstring)
           ebv = intercalate "." <$> bump bt vstringS

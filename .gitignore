@@ -21,4 +21,3 @@ cabal.sandbox.config
 *.eventlog
 .stack-work/
 cabal.project.local
-stack-bump.cabal
